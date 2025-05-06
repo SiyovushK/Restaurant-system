@@ -4,5 +4,6 @@ public class CreateReservationDTO
 {
     public int TableId { get; set; }
     public int CustomerId { get; set; }
-    public DateTime ReservationDate { get; set; }
+    public DateTime ReservationDateFrom { get; set; }
+    public DateTime ReservationDateTo { get; set; }
 }

@@ -8,10 +8,10 @@
 <h3 class="text-xl font-semibold mb-4">Список всех резерваций</h3>
 
 <EditForm Model="@filter" OnValidSubmit="LoadReservations">
-    <div class="flex gap-4 items-end mb-4">
-        <InputNumber @bind-Value="filter.TableId" placeholder="ID столика" class="form-control" />
+    <div class="flex gap-4 flex-wrap items-end mb-4">
+        <InputNumber @bind-Value="filter.TableId" class="form-control" placeholder="ID столика" />
         <br>
-        <InputNumber @bind-Value="filter.CustomerId" placeholder="ID клиента" class="form-control" />
+        <InputNumber @bind-Value="filter.CustomerId" class="form-control" placeholder="ID клиента" />
         <br>
         <InputDate @bind-Value="filter.ReservationDate" class="form-control" />
         <br>
@@ -51,7 +51,7 @@ else
                     <td>@res.Id</td>
                     <td>@res.TableId</td>
                     <td>@res.CustomerId</td>
-                    <td>@res.ReservationDate?.ToString("g")</td>
+                    <td>@res.ReservationDateFrom?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") - @res.ReservationDateTo?.ToLocalTime().ToString("HH:mm")</td>
                     <td>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteReservation(res.Id)">Удалить</button>
                     </td>
@@ -61,10 +61,19 @@ else
     </table>
 }
 
+<div class="mt-4 flex items-center gap-4">
+    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@(!CanGoPrevious)">Назад</button>
+    <span>Страница @filter.PageNumber</span>
+    <button class="btn btn-secondary" @onclick="NextPage" disabled="@(!CanGoNext)">Вперёд</button>
+</div>
+
 @code {
     private List<GetReservationDTO>? reservations;
     private ReservationFilter filter = new() { PageNumber = 1, PageSize = 100 };
     private string Message = string.Empty;
+
+    private bool CanGoPrevious => filter.PageNumber > 1;
+    private bool CanGoNext => reservations?.Count == filter.PageSize;
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,15 +82,33 @@ else
 
     private async Task LoadReservations()
     {
+        filter.ReservationDate = ConvertToUtc(filter.ReservationDate);
+
         var result = await ReservationService.GetAllAsync(filter);
         if (result.IsSuccess)
         {
             reservations = result.Data;
+            Message = string.Empty;
         }
         else
         {
+            reservations = new();
             Message = result.Message;
-            reservations = [];
+        }
+    }
+
+    private async Task NextPage()
+    {
+        filter.PageNumber++;
+        await LoadReservations();
+    }
+
+    private async Task PreviousPage()
+    {
+        if (filter.PageNumber > 1)
+        {
+            filter.PageNumber--;
+            await LoadReservations();
         }
     }
 
@@ -90,5 +117,17 @@ else
         var result = await ReservationService.DeleteAsync(id);
         Message = result.Message;
         await LoadReservations();
+    }
+
+    private DateTime? ConvertToUtc(DateTime? dt)
+    {
+        if (dt == null) return null;
+
+        if (dt.Value.Kind == DateTimeKind.Unspecified)
+            return DateTime.SpecifyKind(dt.Value, DateTimeKind.Utc);
+        else if (dt.Value.Kind == DateTimeKind.Local)
+            return dt.Value.ToUniversalTime();
+        else
+            return dt;
     }
 }

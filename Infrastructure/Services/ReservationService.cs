@@ -10,17 +10,40 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
-public class ReservationService(DataContext context, IMapper mapper) : IReservationService
+public class ReservationService(DataContext context, IMapper mapper, ICustomerService customerService) : IReservationService
 {
     public async Task<Response<GetReservationDTO>> CreateAsync(CreateReservationDTO createReservation)
     {
-        createReservation.ReservationDate = createReservation.ReservationDate.ToUniversalTime();
+        createReservation.ReservationDateFrom = createReservation.ReservationDateFrom.ToUniversalTime();
+        createReservation.ReservationDateTo = createReservation.ReservationDateTo.ToUniversalTime();
 
-        if (await context.Reservations.AnyAsync(
-            r => r.ReservationDate == createReservation.ReservationDate &&
-            r.TableId == createReservation.TableId
-        ))
-            return new Response<GetReservationDTO>(HttpStatusCode.BadRequest, $"Reservation at {createReservation.ReservationDate} already exists, choose different time");
+        var customerResult = await customerService.GetByIdAsync(createReservation.CustomerId);
+        if (!customerResult.IsSuccess)
+        {
+            return new Response<GetReservationDTO>(HttpStatusCode.BadRequest, "Customer does not exist");
+        }
+
+        if (createReservation.ReservationDateFrom >= createReservation.ReservationDateTo)
+        {
+            return new Response<GetReservationDTO>(HttpStatusCode.BadRequest, "Reservation start time must be before end time");
+        }
+
+        var dayStart = createReservation.ReservationDateFrom.Date;
+        var dayEnd = dayStart.AddDays(1);
+
+        var check = await context.Reservations.AnyAsync(r =>
+            r.TableId == createReservation.TableId &&
+            r.ReservationDateFrom < createReservation.ReservationDateTo &&
+            r.ReservationDateTo > createReservation.ReservationDateFrom &&
+            r.ReservationDateFrom >= dayStart &&
+            r.ReservationDateFrom < dayEnd
+        );
+
+        if (check)
+        {
+            return new Response<GetReservationDTO>(HttpStatusCode.BadRequest,
+                $"Reservation for TableId {createReservation.TableId} overlaps with an existing reservation. Please choose a different time.");
+        }
 
         var reservation = mapper.Map<Reservation>(createReservation);
 
@@ -71,12 +94,13 @@ public class ReservationService(DataContext context, IMapper mapper) : IReservat
             var date = filter.ReservationDate.Value.Date;
             var nextDate = date.AddDays(1);
 
-            query = query.Where(r => r.ReservationDate >= date && r.ReservationDate < nextDate);
-        }
+            query = query.Where(r => r.ReservationDateFrom >= date && r.ReservationDateFrom < nextDate);
+        }   
 
         var totalRecords = await query.CountAsync();
 
         var reservations = await query
+            .OrderBy(r => r.ReservationDateFrom)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

@@ -7,4 +7,5 @@ public interface ICustomerService
 {
     Task<Response<GetCustomerDTO>> CreateAsync(CreateCustomerDTO createCustomer);
     Task<Response<string>> DeleteAsync(int customerId);
+    Task<Response<GetCustomerDTO>> GetByIdAsync(int customerId);
 }

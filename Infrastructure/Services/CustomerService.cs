@@ -45,4 +45,15 @@ public class CustomerService(DataContext context, IMapper mapper) : ICustomerSer
             ? new Response<string>(HttpStatusCode.InternalServerError, "Customer couldn't be deleted")
             : new Response<string>("Customer deleted successfully");
     }
+
+    public async Task<Response<GetCustomerDTO>> GetByIdAsync(int customerId)
+    {
+        var customer = await context.Customers.FirstOrDefaultAsync(c => c.Id == customerId);
+        if (customer == null)
+            return new Response<GetCustomerDTO>(HttpStatusCode.NotFound, "Customer does not exist");
+        
+        var getCustomer = mapper.Map<GetCustomerDTO>(customer);
+
+        return new Response<GetCustomerDTO>(getCustomer);
+    }
 }

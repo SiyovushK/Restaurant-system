@@ -9,10 +9,14 @@
 
 <h3>Бронирование столика</h3>
 
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="alert alert-danger">@Message</div>
+}
 @if (reservationCreated)
 {
-    <p>Бронирование успешно создано!</p>
-    <button class="btn btn-primary" @onclick="GoToReservations">Перейти к бронированиям</button>
+    <div class="alert alert-success">Бронирование успешно создано!</div>
+    <button class="btn btn-primary" @onclick="GoToReservations">Перейти к списку</button>
 }
 else
 {
@@ -21,32 +25,41 @@ else
         <ValidationSummary />
 
         <div class="form-group">
-            <label for="TableId">ID столика</label>
-            <InputNumber id="TableId" class="form-control" @bind-Value="reservation.TableId" readonly />
+            <label>Столик ID</label>
+            <InputNumber class="form-control" @bind-Value="reservation.TableId" readonly />
         </div>
 
         <div class="form-group">
-            <label for="CustomerId">ID клиента</label>
-            <InputNumber id="CustomerId" class="form-control" @bind-Value="reservation.CustomerId" />
+            <label>Клиент ID</label>
+            <InputNumber class="form-control" @bind-Value="reservation.CustomerId" />
         </div>
 
         <div class="form-group">
-            <label for="ReservationDate">Дата бронирования (mm:dd:yyyy)</label>
-            <InputDate @bind-Value="selectedDate" class="form-control" />
+            <label>Дата</label>
+            <InputDate class="form-control" @bind-Value="selectedDate" />
         </div>
 
         <div class="form-group">
-            <label for="ReservationHour">Время</label>
-            <InputSelect @bind-Value="selectedHour" class="form-control">
-                @for (int hour = 0; hour < 24; hour++)
+            <label>Время начала</label>
+            <InputSelect class="form-control" @bind-Value="selectedHourFrom">
+                @for (int h = 0; h < 24; h++)
                 {
-                    <option value="@hour">@($"{hour:D2}:00")</option>
+                    <option value="@h">@($"{h:D2}:00")</option>
                 }
             </InputSelect>
         </div>
 
-        <br />
-        <button type="submit" class="btn btn-success">Создать бронирование</button>
+        <div class="form-group">
+            <label>Время окончания</label>
+            <InputSelect class="form-control" @bind-Value="selectedHourTo">
+                @for (int h = selectedHourFrom + 1; h <= 24; h++)
+                {
+                    <option value="@h">@($"{h:D2}:00")</option>
+                }
+            </InputSelect>
+        </div>
+        <br>
+        <button class="btn btn-success" type="submit">Забронировать</button>
     </EditForm>
 }
 
@@ -55,9 +68,10 @@ else
 
     private CreateReservationDTO reservation = new();
     private bool reservationCreated = false;
-
+    private string Message = string.Empty;
     private DateTime selectedDate = DateTime.Today;
-    private int selectedHour = DateTime.Now.Hour;
+    private int selectedHourFrom = 18;
+    private int selectedHourTo = 20;
 
     protected override void OnInitialized()
     {
@@ -66,20 +80,32 @@ else
 
     private async Task HandleValidSubmit()
     {
-        reservation.ReservationDate = new DateTime(
-            selectedDate.Year,
-            selectedDate.Month,
-            selectedDate.Day,
-            selectedHour,
-            0,
-            0
-        );
+        var customerCheck = await CustomerService.GetByIdAsync(reservation.CustomerId);
+        if (!customerCheck.IsSuccess)
+        {
+            Console.WriteLine(customerCheck.Message);
+            Message = "Ошибка: клиент с таким ID не найден.";
+            return;
+        }
+
+        reservation.ReservationDateFrom = new DateTime(
+            selectedDate.Year, selectedDate.Month, selectedDate.Day, selectedHourFrom, 0, 0, DateTimeKind.Local)
+            .ToUniversalTime();
+
+        reservation.ReservationDateTo = new DateTime(
+            selectedDate.Year, selectedDate.Month, selectedDate.Day, selectedHourTo, 0, 0, DateTimeKind.Local)
+            .ToUniversalTime();
 
         var response = await ReservationService.CreateAsync(reservation);
+
         if (response.IsSuccess)
         {
             reservationCreated = true;
             ResetForm();
+        }
+        else
+        {
+            Console.WriteLine(response.Message);
         }
     }
 
@@ -87,7 +113,8 @@ else
     {
         reservation = new CreateReservationDTO { TableId = TableId };
         selectedDate = DateTime.Today;
-        selectedHour = DateTime.Now.Hour;
+        selectedHourFrom = 18;
+        selectedHourTo = 20;
     }
 
     private void GoToReservations()

@@ -14,7 +14,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ITableService, TableService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddDbContext<DataContext>(opt =>
-    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped);
 
 var app = builder.Build();
 
