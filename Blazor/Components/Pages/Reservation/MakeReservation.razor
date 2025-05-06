@@ -1,0 +1,97 @@
+@page "/reserve/{TableId:int}"
+@using Infrastructure.Interfaces
+@using Domain.DTOs.ReservationDTOs
+@using Domain.DTOs.CustomerDTOs
+@inject ICustomerService CustomerService
+@inject IReservationService ReservationService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Бронирование столика</h3>
+
+@if (reservationCreated)
+{
+    <p>Бронирование успешно создано!</p>
+    <button class="btn btn-primary" @onclick="GoToReservations">Перейти к бронированиям</button>
+}
+else
+{
+    <EditForm Model="reservation" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="TableId">ID столика</label>
+            <InputNumber id="TableId" class="form-control" @bind-Value="reservation.TableId" readonly />
+        </div>
+
+        <div class="form-group">
+            <label for="CustomerId">ID клиента</label>
+            <InputNumber id="CustomerId" class="form-control" @bind-Value="reservation.CustomerId" />
+        </div>
+
+        <div class="form-group">
+            <label for="ReservationDate">Дата бронирования (mm:dd:yyyy)</label>
+            <InputDate @bind-Value="selectedDate" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="ReservationHour">Время</label>
+            <InputSelect @bind-Value="selectedHour" class="form-control">
+                @for (int hour = 0; hour < 24; hour++)
+                {
+                    <option value="@hour">@($"{hour:D2}:00")</option>
+                }
+            </InputSelect>
+        </div>
+
+        <br />
+        <button type="submit" class="btn btn-success">Создать бронирование</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public int TableId { get; set; }
+
+    private CreateReservationDTO reservation = new();
+    private bool reservationCreated = false;
+
+    private DateTime selectedDate = DateTime.Today;
+    private int selectedHour = DateTime.Now.Hour;
+
+    protected override void OnInitialized()
+    {
+        reservation.TableId = TableId;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        reservation.ReservationDate = new DateTime(
+            selectedDate.Year,
+            selectedDate.Month,
+            selectedDate.Day,
+            selectedHour,
+            0,
+            0
+        );
+
+        var response = await ReservationService.CreateAsync(reservation);
+        if (response.IsSuccess)
+        {
+            reservationCreated = true;
+            ResetForm();
+        }
+    }
+
+    private void ResetForm()
+    {
+        reservation = new CreateReservationDTO { TableId = TableId };
+        selectedDate = DateTime.Today;
+        selectedHour = DateTime.Now.Hour;
+    }
+
+    private void GoToReservations()
+    {
+        Navigation.NavigateTo("/reservations");
+    }
+}

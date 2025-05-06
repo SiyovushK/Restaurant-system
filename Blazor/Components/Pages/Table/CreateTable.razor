@@ -1,0 +1,48 @@
+@page "/create-table"
+@using Infrastructure.Interfaces
+@using Domain.DTOs.TableDTOs
+@inject ITableService TableService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Создать столик</h3>
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="alert alert-info">@Message</div>
+}
+
+<EditForm Model="@newTable" OnValidSubmit="HandleCreate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Номер столика</label>
+        <InputNumber @bind-Value="newTable.Number" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Количество мест</label>
+        <InputNumber @bind-Value="newTable.Seats" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Создать</button>
+</EditForm>
+
+@code {
+    private CreateTableDTO newTable = new CreateTableDTO();
+    private string Message = string.Empty;
+
+    private async Task HandleCreate()
+    {
+        var response = await TableService.CreateAsync(newTable);
+        if (response.IsSuccess)
+        {
+            Navigation.NavigateTo($"/all-tables");
+        }
+        else
+        {
+            Message = response.Message;
+        }
+    }
+}

@@ -1,0 +1,54 @@
+@page "/customers/create"
+@using Infrastructure.Interfaces
+@using Domain.DTOs.CustomerDTOs
+@inject ICustomerService CustomerService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3 class="text-xl font-semibold mb-4">Создать клиента</h3>
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="alert alert-info">@Message</div>
+}
+
+<EditForm Model="@newCustomer" OnValidSubmit="HandleCreate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Имя</label>
+        <InputText @bind-Value="newCustomer.FirstName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Фамилия</label>
+        <InputText @bind-Value="newCustomer.LastName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Телефон</label>
+        <InputText @bind-Value="newCustomer.Phone" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Создать</button>
+</EditForm>
+
+@code {
+    private CreateCustomerDTO newCustomer = new();
+    private string Message = string.Empty;
+
+    private async Task HandleCreate()
+    {
+        var result = await CustomerService.CreateAsync(newCustomer);
+
+        if (result.IsSuccess)
+        {
+            Message = "Клиент успешно создан!";
+        }
+        else
+        {
+            Message = result.Message;
+        }
+    }
+}

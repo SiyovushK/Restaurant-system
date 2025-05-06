@@ -1,0 +1,94 @@
+@page "/reservations"
+@using Infrastructure.Interfaces
+@using Domain.DTOs.ReservationDTOs
+@using Domain.Filters
+@inject IReservationService ReservationService
+@rendermode InteractiveServer
+
+<h3 class="text-xl font-semibold mb-4">Список всех резерваций</h3>
+
+<EditForm Model="@filter" OnValidSubmit="LoadReservations">
+    <div class="flex gap-4 items-end mb-4">
+        <InputNumber @bind-Value="filter.TableId" placeholder="ID столика" class="form-control" />
+        <br>
+        <InputNumber @bind-Value="filter.CustomerId" placeholder="ID клиента" class="form-control" />
+        <br>
+        <InputDate @bind-Value="filter.ReservationDate" class="form-control" />
+        <br>
+        <button class="btn btn-primary" type="submit">Применить фильтр</button>
+    </div>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <div class="alert alert-info">@Message</div>
+}
+
+@if (reservations is null)
+{
+    <p>Загрузка...</p>
+}
+else if (!reservations.Any())
+{
+    <p>Нет резерваций по заданным параметрам.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Столик</th>
+                <th>Клиент</th>
+                <th>Дата</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var res in reservations)
+            {
+                <tr>
+                    <td>@res.Id</td>
+                    <td>@res.TableId</td>
+                    <td>@res.CustomerId</td>
+                    <td>@res.ReservationDate?.ToString("g")</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteReservation(res.Id)">Удалить</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<GetReservationDTO>? reservations;
+    private ReservationFilter filter = new() { PageNumber = 1, PageSize = 100 };
+    private string Message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadReservations();
+    }
+
+    private async Task LoadReservations()
+    {
+        var result = await ReservationService.GetAllAsync(filter);
+        if (result.IsSuccess)
+        {
+            reservations = result.Data;
+        }
+        else
+        {
+            Message = result.Message;
+            reservations = [];
+        }
+    }
+
+    private async Task DeleteReservation(int id)
+    {
+        var result = await ReservationService.DeleteAsync(id);
+        Message = result.Message;
+        await LoadReservations();
+    }
+}

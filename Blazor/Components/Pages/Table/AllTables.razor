@@ -1,0 +1,85 @@
+@page "/all-tables"
+@using Infrastructure.Interfaces
+@using Domain.DTOs.TableDTOs
+@inject ITableService TableService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<h3>Все столики</h3>
+
+@if (tables == null)
+{
+    <p>Загрузка...</p>
+}
+else
+{
+    <p>Всего столиков: @totalTablesCount</p>
+    <button class="btn btn-success" @onclick="CreateNewTable">Создать новый столик</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Номер столика</th>
+                <th>Количество мест</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var table in tables)
+            {
+                <tr>
+                    <td>@table.Number</td>
+                    <td>@table.Seats</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="() => ReserveTable(table.Id)">Зарезервировать</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteTable(table.Id)">Удалить</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private List<GetTableDTO> tables;
+    private int totalTablesCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await TableService.GetAllAsync(1, 10);
+        if (response.IsSuccess)
+        {
+            tables = response.Data;
+        }
+
+        var countResponse = await TableService.GetTablesCountAsync();
+        if (countResponse.IsSuccess)
+        {
+            totalTablesCount = countResponse.Data;
+        }
+    }
+
+    private void ReserveTable(int tableId)
+    {
+        Navigation.NavigateTo($"/reserve/{tableId}");
+    }
+
+    private async Task DeleteTable(int tableId)
+    {
+        var response = await TableService.DeleteAsync(tableId);
+        if (response.IsSuccess)
+        {
+            tables = tables.Where(t => t.Id != tableId).ToList();
+            var countResponse = await TableService.GetTablesCountAsync();
+            if (countResponse.IsSuccess)
+            {
+                totalTablesCount = countResponse.Data;
+            }
+        }
+    }
+
+    private void CreateNewTable()
+    {
+        Navigation.NavigateTo("/create-table");
+    }
+}
