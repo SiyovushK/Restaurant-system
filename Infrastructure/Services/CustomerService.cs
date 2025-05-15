@@ -56,4 +56,13 @@ public class CustomerService(DataContext context, IMapper mapper) : ICustomerSer
 
         return new Response<GetCustomerDTO>(getCustomer);
     }
+
+    public async Task<Response<List<GetCustomerDTO>>> GetAllAsync()
+    {
+        var customers = await context.Customers.ToListAsync();
+
+        var getCustomers = mapper.Map<List<GetCustomerDTO>>(customers);
+
+        return new Response<List<GetCustomerDTO>>(getCustomers);
+    }
 }

@@ -10,3 +10,15 @@ C:\Users\-\Desktop\HW 05.05\Domain\obj\Debug\net9.0\refint\Domain.dll
 C:\Users\-\Desktop\HW 05.05\Domain\obj\Debug\net9.0\Domain.pdb
 C:\Users\-\Desktop\HW 05.05\Domain\obj\Debug\net9.0\ref\Domain.dll
 C:\Users\-\Desktop\HW 05.05\Domain\obj\Debug\net9.0\Domain.sourcelink.json
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\bin\Debug\net9.0\Domain.deps.json
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\bin\Debug\net9.0\Domain.dll
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\bin\Debug\net9.0\Domain.pdb
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.AssemblyInfoInputs.cache
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.AssemblyInfo.cs
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.csproj.CoreCompileInputs.cache
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.sourcelink.json
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.dll
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\refint\Domain.dll
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\Domain.pdb
+C:\Softclub\C# N4\HW\HW week5 Blazor\HW 05.05 EXAM restaurant\Domain\obj\Debug\net9.0\ref\Domain.dll

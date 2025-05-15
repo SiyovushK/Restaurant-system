@@ -31,19 +31,19 @@ public class ReservationService(DataContext context, IMapper mapper, ICustomerSe
         var dayStart = createReservation.ReservationDateFrom.Date;
         var dayEnd = dayStart.AddDays(1);
 
-        var check = await context.Reservations.AnyAsync(r =>
-            r.TableId == createReservation.TableId &&
-            r.ReservationDateFrom < createReservation.ReservationDateTo &&
-            r.ReservationDateTo > createReservation.ReservationDateFrom &&
-            r.ReservationDateFrom >= dayStart &&
-            r.ReservationDateFrom < dayEnd
-        );
+        // var check = await context.Reservations.AnyAsync(r =>
+        //     r.TableId == createReservation.TableId &&
+        //     (r.ReservationDateFrom <= createReservation.ReservationDateFrom && r.ReservationDateFrom < createReservation.ReservationDateTo ||
+        //     r.ReservationDateFrom <= createReservation.ReservationDateFrom && r.ReservationDateFrom <= createReservation.ReservationDateTo) &&
+        //     r.ReservationDateFrom >= dayStart &&
+        //     r.ReservationDateFrom < dayEnd
+        // );
 
-        if (check)
-        {
-            return new Response<GetReservationDTO>(HttpStatusCode.BadRequest,
-                $"Reservation for TableId {createReservation.TableId} overlaps with an existing reservation. Please choose a different time.");
-        }
+        // if (!check)
+        // {
+        //     return new Response<GetReservationDTO>(HttpStatusCode.BadRequest,
+        //         $"Reservation for TableId {createReservation.TableId} overlaps with an existing reservation. Please choose a different time.");
+        // }
 
         var reservation = mapper.Map<Reservation>(createReservation);
 

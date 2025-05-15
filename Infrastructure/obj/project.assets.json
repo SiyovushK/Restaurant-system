@@ -843,11 +843,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\-\\Desktop\\HW 05.05\\Infrastructure\\Infrastructure.csproj",
+      "projectUniqueName": "C:\\Softclub\\C# N4\\HW\\HW week5 Blazor\\HW 05.05 EXAM restaurant\\Infrastructure\\Infrastructure.csproj",
       "projectName": "Infrastructure",
-      "projectPath": "C:\\Users\\-\\Desktop\\HW 05.05\\Infrastructure\\Infrastructure.csproj",
+      "projectPath": "C:\\Softclub\\C# N4\\HW\\HW week5 Blazor\\HW 05.05 EXAM restaurant\\Infrastructure\\Infrastructure.csproj",
       "packagesPath": "C:\\Users\\-\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\-\\Desktop\\HW 05.05\\Infrastructure\\obj\\",
+      "outputPath": "C:\\Softclub\\C# N4\\HW\\HW week5 Blazor\\HW 05.05 EXAM restaurant\\Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\-\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -862,8 +862,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "C:\\Users\\-\\Desktop\\HW 05.05\\Domain\\Domain.csproj": {
-              "projectPath": "C:\\Users\\-\\Desktop\\HW 05.05\\Domain\\Domain.csproj"
+            "C:\\Softclub\\C# N4\\HW\\HW week5 Blazor\\HW 05.05 EXAM restaurant\\Domain\\Domain.csproj": {
+              "projectPath": "C:\\Softclub\\C# N4\\HW\\HW week5 Blazor\\HW 05.05 EXAM restaurant\\Domain\\Domain.csproj"
             }
           }
         }
@@ -909,7 +909,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.105/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.106/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
